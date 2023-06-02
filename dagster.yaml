@@ -1,0 +1,79 @@
+# https://docs.dagster.io/deployment/dagster-instance#dagster-instance
+# see above link for config items
+#
+# Storage - Controls how job and asset history is persisted.
+# This includes run, event log, and schedule/sensor tick metadata, as well as other useful data.
+# Config data is going to external PG db instead of in files on disk
+# Hard code values - not advisable
+storage:
+  postgres:
+    postgres_db:
+      username: 
+      password: 
+      hostname: 
+      db_name: 
+      port: 
+# better than hard coding
+# and this config grabs the database credentials from environment variables
+# storage:
+#   postgres:
+#     postgres_db:
+#       username:
+#         env: DAGSTER_PG_USERNAME
+#       password:
+#         env: DAGSTER_PG_PASSWORD
+#       hostname:
+#         env: DAGSTER_PG_HOST
+#       db_name:
+#         env: DAGSTER_PG_DB
+#       port: 31781
+#
+#
+# https://docs.dagster.io/deployment/dagster-instance#data-retention
+retention:
+  schedule:
+    purge_after_days: 90 # sets retention policy for schedule ticks of all types
+  sensor:
+    purge_after_days:
+      skipped: 7
+      failure: 30
+      success: -1 # keep success ticks indefinitely
+# Scheduling
+schedules:
+  use_threads: true
+  num_workers: 8
+# Configures how long Dagster keeps sensor / schedule tick data
+sensors:
+  use_threads: true
+  num_workers: 8
+# The telemetry key allows you to opt in or out of Dagster collecting anonymized usage statistics.
+telemetry:
+  enabled: false
+#
+# RunLauncher
+# there are multiple ways to configure the K8sRunLauncher
+# you can set the follow configuration values directly
+# run_launcher:
+#   module: dagster_k8s.launcher
+#   class: K8sRunLauncher
+#   config:
+#     service_account_name: pipeline_run_service_account
+#     job_image: my_project/dagster_image:latest
+#     instance_config_map: dagster-instance
+#     postgres_password_secret: dagster-postgresql-secret
+
+# # alternatively, you can grab any of these config values from environment variables:
+# run_launcher:
+#   module: dagster_k8s.launcher
+#   class: K8sRunLauncher
+#   config:
+#     service_account_name:
+#       env: PIPELINE_RUN_SERVICE_ACCOUNT
+#     job_image:
+#       env: DAGSTER_IMAGE_NAME
+#     instance_config_map:
+#       env: DAGSTER_INSTANCE_CONFIG_MAP
+#     postgres_password_secret:
+#       env: DAGSTER_POSTGRES_SECRET
+
+
