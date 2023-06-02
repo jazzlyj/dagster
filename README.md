@@ -11,7 +11,21 @@ Dagster is being used as an orchestration platform for the development, producti
 
 In short: a much better way to do ETL!
 
-## Environment Variables
+## Environment Variables (env vars)
+One can create a *.env* file and store env vars there. 
+
+a .env file has key value pairs of items used in software deployment configs
+
+Eg: 
+NOTE: change the values to the correct ones for your setup
+```
+DBHOST=yourdbserverhostname
+DBSchema=postgres
+DBPort=5432
+DBUser=postgres
+DBPassword=postgres
+```
+
 
 ## Installation
 
@@ -21,6 +35,9 @@ A working Kubernetes cluster. If needed build a cluster with minikube.
 [Download, install, start Minikube](https://minikube.sigs.k8s.io/docs/start/)
 
 ### Infrastructure Deployment using Terraform
+#### Structure
+The deployment is setup as a Terraform module *../modules/dagster/* and organized so that multiple environments can be deployed *../dev/* (only dev) for now
+ 
 
 - This Dagster deployment is backed by a Postgres db to store these dagster internals:
 
@@ -41,12 +58,14 @@ A working Kubernetes cluster. If needed build a cluster with minikube.
 
 1) Clone the repo
 ```bash
-git clone 
-cd 
+git clone https://github.com/jazzlyj/dagster.git
+cd dagster
 ```
 
 2) Run terraform
+
 ```bash
+cd dev
 terraform init
 terraform plan
 terraform apply -auto-approve
@@ -116,6 +135,7 @@ kubectl port-forward postgres--all-dagster-dev --namespace=all-dagster-dev --add
 ```
 
 ### Python and Venv
+Create a python venv for your dagster install and code base
 
 1. (If necessary) Install Python 3.10, libs/tools
 
@@ -158,6 +178,7 @@ NOTE: make sure the versions are compatible. ie dont run dagster 1.2.4 and dagst
 
 To run this project, you will need to
 a) set the env var DAGSTER_HOME
+This is where ever you cloned the repo
 
 Eg:
 
@@ -165,11 +186,11 @@ Eg:
 export DAGSTER_HOME=/local/mnt/dagster
 ```
 
-b) create a dagster.yaml file in DAGSTER_HOME.
+b) Configure the *dagster.yaml* file in DAGSTER_HOME.
 
 The Dagster instance defines the configuration that Dagster needs for a single deployment.
 
-All of the processes and services that make up a Dagster deployment should share a single instance config file, named dagster.yaml, so that they can effectively share information.
+All of the processes and services that make up a Dagster deployment should share a single instance config file, named *dagster.yaml*, so that they can effectively share information.
 
 _NOTE_ make sure the port number is up to date with the current port number of the node port for the service in K8s
 
@@ -186,7 +207,7 @@ telemetry:
   enabled: false
 ```
 
-c) create a workspace.yaml file in DAGSTER_HOME. A workspace file tells Dagster where to find code locations.
+c) create a *workspace.yaml* file in DAGSTER_HOME. A workspace file tells Dagster where to find code locations.
 
 This is needed if dagster is running as a daemon. (so it knows what python files to load)
 
@@ -204,7 +225,7 @@ load_from:
 
 Start dagster and the dagit UI:
 
-### Locally as a daemon
+### Running locally as a daemon
 
 This command launches both Dagit and the Dagster daemon, allowing you to start a full local deployment of Dagster from the command line.
 
@@ -216,7 +237,7 @@ Each of the included daemons then runs on a regular interval in its own threads.
 dagster dev
 ```
 
-### Locally launching just a python file
+### Running locally launching just a python file
 
 ```bash
 dagit -f assets.py
@@ -228,8 +249,11 @@ dagit -f assets.py
 **Server:** Dagit UI server via infra deployed in Kubernetes (see above)
 
 
+## Repo
+[Dagster](https://github.com/jazzlyj/dagster)
+
 ## Authors
 
-- Jay Lavine
+- [Jay Lavine](https://github.com/jazzlyj)
 
 
